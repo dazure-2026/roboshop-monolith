@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>Payment</title></head>
+<body>
+<div layout:fragment="content">
+    <h1>Payment</h1>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}">Error</div>
+
+    <div class="checkout-container">
+        <div class="checkout-items">
+            <h2>Order Summary</h2>
+            <div th:each="item : ${cart.items}" class="checkout-item">
+                <span th:text="${item.product.name}">Product</span>
+                <span th:text="'x' + ${item.quantity}">x1</span>
+                <span th:text="'$' + ${#numbers.formatDecimal(item.product.price * item.quantity, 1, 2)}">$0.00</span>
+            </div>
+            <div class="checkout-subtotal">
+                <span>Subtotal:</span>
+                <span th:text="'$' + ${#numbers.formatDecimal(cartTotal, 1, 2)}">$0.00</span>
+            </div>
+            <div class="checkout-shipping">
+                <span>Shipping:</span>
+                <span th:text="'$' + ${#numbers.formatDecimal(shippingCost, 1, 2)}">$0.00</span>
+            </div>
+            <div class="checkout-total">
+                <span>Total:</span>
+                <span th:text="'$' + ${#numbers.formatDecimal(cartTotal + shippingCost, 1, 2)}">$0.00</span>
+            </div>
+        </div>
+
+        <div class="checkout-form">
+            <h2>Payment Details</h2>
+            <div class="payment-badge">
+                <span class="payment-icons">&#128179; &#128177;</span>
+                <span class="payment-secure">Secure Payment</span>
+            </div>
+            <form th:action="@{/payment}" method="post" id="paymentForm">
+                <input type="hidden" name="cityId" th:value="${cityId}"/>
+                <div class="form-group">
+                    <label for="cardName">Name on Card</label>
+                    <input type="text" id="cardName" name="cardName" required class="form-input"
+                           placeholder="John Doe" autocomplete="cc-name"/>
+                </div>
+                <div class="form-group">
+                    <label for="cardNumber">Card Number</label>
+                    <input type="text" id="cardNumber" name="cardNumber" required class="form-input"
+                           placeholder="4111 1111 1111 1111" maxlength="19" autocomplete="cc-number"
+                           oninput="formatCardNumber(this)"/>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiry">Expiry Date</label>
+                        <input type="text" id="expiry" name="expiry" required class="form-input"
+                               placeholder="MM/YY" maxlength="5" autocomplete="cc-exp"
+                               oninput="formatExpiry(this)"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="cvv">CVV</label>
+                        <input type="text" id="cvv" name="cvv" required class="form-input"
+                               placeholder="123" maxlength="4" autocomplete="cc-csc"/>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary btn-lg btn-block" id="payBtn">
+                    Pay $<span th:text="${#numbers.formatDecimal(cartTotal + shippingCost, 1, 2)}">0.00</span>
+                </button>
+                <p class="payment-disclaimer">This is a demo store. No real charges will be made.</p>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function formatCardNumber(input) {
+        var v = input.value.replace(/\D/g, '').substring(0, 16);
+        input.value = v.replace(/(.{4})/g, '$1 ').trim();
+    }
+    function formatExpiry(input) {
+        var v = input.value.replace(/\D/g, '').substring(0, 4);
+        if (v.length >= 2) {
+            input.value = v.substring(0, 2) + '/' + v.substring(2);
+        } else {
+            input.value = v;
+        }
+    }
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        var btn = document.getElementById('payBtn');
+        btn.disabled = true;
+        btn.textContent = 'Processing...';
+    });
+</script>
+</body>
+</html>

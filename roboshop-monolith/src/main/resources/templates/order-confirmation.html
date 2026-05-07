@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>Order Confirmation</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="confirmation-container">
+        <div class="confirmation-icon">&#10004;</div>
+        <h1>Order Placed Successfully!</h1>
+        <p class="order-id">Order #<span th:text="${order.id}">1</span></p>
+
+        <div class="confirmation-details">
+            <div class="detail-row">
+                <span>Status:</span>
+                <span class="status-badge" th:text="${order.status}">PLACED</span>
+            </div>
+            <div class="detail-row">
+                <span>Shipping to:</span>
+                <span th:text="${order.shippingCity}">City</span>
+            </div>
+            <div class="detail-row">
+                <span>Payment:</span>
+                <span th:text="${order.payment.method}">CARD ****1111</span>
+            </div>
+            <div class="detail-row">
+                <span>Transaction ID:</span>
+                <span th:text="${order.payment.transactionId}">TXN-XXXXXXXX</span>
+            </div>
+        </div>
+
+        <table class="cart-table">
+            <thead>
+                <tr><th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${order.items}">
+                    <td th:text="${item.product.name}">Product</td>
+                    <td th:text="${item.quantity}">1</td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 2)}">$0.00</td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(item.price * item.quantity, 1, 2)}">$0.00</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="cart-summary">
+            <div class="detail-row"><span>Subtotal:</span><span th:text="'$' + ${#numbers.formatDecimal(order.total, 1, 2)}">$0.00</span></div>
+            <div class="detail-row"><span>Shipping:</span><span th:text="'$' + ${#numbers.formatDecimal(order.shippingCost, 1, 2)}">$0.00</span></div>
+            <div class="cart-total"><span>Total Paid:</span><span th:text="'$' + ${#numbers.formatDecimal(order.total + order.shippingCost, 1, 2)}">$0.00</span></div>
+        </div>
+
+        <div class="confirmation-actions">
+            <a th:href="@{/orders}" class="btn-secondary">View All Orders</a>
+            <a th:href="@{/catalogue}" class="btn-primary">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

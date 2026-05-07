@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>Checkout</title></head>
+<body>
+<div layout:fragment="content">
+    <h1>Checkout</h1>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}">Error</div>
+
+    <div class="checkout-container">
+        <div class="checkout-items">
+            <h2>Order Summary</h2>
+            <div th:each="item : ${cart.items}" class="checkout-item">
+                <span th:text="${item.product.name}">Product</span>
+                <span th:text="'x' + ${item.quantity}">x1</span>
+                <span th:text="'$' + ${#numbers.formatDecimal(item.product.price * item.quantity, 1, 2)}">$0.00</span>
+            </div>
+            <div class="checkout-subtotal">
+                <span>Subtotal:</span>
+                <span th:text="'$' + ${#numbers.formatDecimal(cartTotal, 1, 2)}">$0.00</span>
+            </div>
+            <div class="checkout-shipping" id="shippingCost">
+                <span>Shipping:</span>
+                <span>Select a city</span>
+            </div>
+            <div class="checkout-total" id="orderTotal">
+                <span>Total:</span>
+                <span th:text="'$' + ${#numbers.formatDecimal(cartTotal, 1, 2)}">$0.00</span>
+            </div>
+        </div>
+
+        <div class="checkout-form">
+            <h2>Shipping Details</h2>
+            <form th:action="@{/payment}" method="get">
+                <div class="form-group">
+                    <label for="cityId">Shipping City:</label>
+                    <select name="cityId" id="cityId" required class="form-input" onchange="updateShipping(this.value)">
+                        <option value="">Select a city...</option>
+                        <option th:each="city : ${cities}" th:value="${city.id}"
+                                th:text="${city.city + ', ' + city.region + ' (' + city.countryCode + ')'}">City</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary btn-lg">Proceed to Payment</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    var cartTotal = [[${cartTotal}]];
+    function updateShipping(cityId) {
+        if (!cityId) return;
+        fetch('/shipping/calc?cityId=' + cityId)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('shippingCost').innerHTML =
+                    '<span>Shipping:</span><span>$' + data.shippingCost.toFixed(2) + '</span>';
+                var total = parseFloat(cartTotal) + parseFloat(data.shippingCost);
+                document.getElementById('orderTotal').innerHTML =
+                    '<span>Total:</span><span>$' + total.toFixed(2) + '</span>';
+            });
+    }
+</script>
+</body>
+</html>

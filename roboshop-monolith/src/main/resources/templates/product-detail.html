@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title th:text="${product.name}">Product</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="breadcrumb">
+        <a th:href="@{/catalogue}">Catalogue</a> &raquo;
+        <a th:href="@{/catalogue(category=${product.category})}" th:text="${product.category}">Category</a> &raquo;
+        <span th:text="${product.name}">Product</span>
+    </div>
+
+    <div class="product-detail">
+        <div class="product-detail-image">
+            <img th:src="${product.imageUrl}" th:alt="${product.name}" class="product-img-large"/>
+        </div>
+        <div class="product-detail-info">
+            <span class="product-category-badge" th:text="${product.category}">Category</span>
+            <h1 th:text="${product.name}">Product Name</h1>
+            <p class="product-sku">SKU: <span th:text="${product.sku}">SKU</span></p>
+            <p class="product-description" th:text="${product.description}">Description</p>
+
+            <div class="rating-summary">
+                <span class="stars" th:text="${'★'.repeat(averageRating.intValue())} + ${'☆'.repeat(5 - averageRating.intValue())}">★★★★☆</span>
+                <span th:text="${#numbers.formatDecimal(averageRating, 1, 1)} + ' (' + ${ratingCount} + ' reviews)'">4.0 (10 reviews)</span>
+            </div>
+
+            <div class="product-price-large" th:text="'$' + ${#numbers.formatDecimal(product.price, 1, 2)}">$0.00</div>
+
+            <p class="stock-info" th:classappend="${product.stock > 0} ? 'in-stock' : 'out-of-stock'">
+                <span th:if="${product.stock > 0}" th:text="'In Stock (' + ${product.stock} + ' available)'">In Stock</span>
+                <span th:unless="${product.stock > 0}">Out of Stock</span>
+            </p>
+
+            <form th:action="@{/cart/add}" method="post" class="add-to-cart-form">
+                <input type="hidden" name="productId" th:value="${product.id}">
+                <div class="quantity-selector">
+                    <label for="quantity">Qty:</label>
+                    <input type="number" name="quantity" id="quantity" value="1" min="1" max="99">
+                </div>
+                <button type="submit" class="btn-primary" th:disabled="${product.stock <= 0}">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+
+    <section class="section">
+        <h2>Customer Reviews</h2>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}">Success</div>
+
+        <div th:if="${currentUser != null}" class="review-form-container">
+            <h3>Write a Review</h3>
+            <form th:action="@{/ratings/add}" method="post" class="review-form">
+                <input type="hidden" name="productId" th:value="${product.id}">
+                <div class="form-group">
+                    <label>Rating:</label>
+                    <div class="star-rating">
+                        <input type="radio" name="score" value="5" id="star5"><label for="star5">&#9733;</label>
+                        <input type="radio" name="score" value="4" id="star4"><label for="star4">&#9733;</label>
+                        <input type="radio" name="score" value="3" id="star3" checked><label for="star3">&#9733;</label>
+                        <input type="radio" name="score" value="2" id="star2"><label for="star2">&#9733;</label>
+                        <input type="radio" name="score" value="1" id="star1"><label for="star1">&#9733;</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="review">Review:</label>
+                    <textarea name="review" id="review" rows="3" placeholder="Share your experience..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Submit Review</button>
+            </form>
+        </div>
+        <div th:unless="${currentUser != null}" class="login-prompt">
+            <p><a th:href="@{/login}">Login</a> to write a review</p>
+        </div>
+
+        <div class="reviews-list">
+            <div th:if="${#lists.isEmpty(ratings)}" class="empty-state">
+                <p>No reviews yet. Be the first!</p>
+            </div>
+            <div th:each="rating : ${ratings}" class="review-card">
+                <div class="review-header">
+                    <span class="review-stars" th:text="${'★'.repeat(rating.score)} + ${'☆'.repeat(5 - rating.score)}">★★★</span>
+                    <span class="review-author" th:text="${rating.user.username}">User</span>
+                    <span class="review-date" th:text="${#temporals.format(rating.createdAt, 'MMM dd, yyyy')}">Date</span>
+                </div>
+                <p th:if="${rating.review != null}" th:text="${rating.review}">Review text</p>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

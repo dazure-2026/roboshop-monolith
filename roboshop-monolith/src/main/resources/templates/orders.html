@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>My Orders</title></head>
+<body>
+<div layout:fragment="content">
+    <h1>My Orders</h1>
+
+    <div th:if="${#lists.isEmpty(orders)}" class="empty-state">
+        <p>You haven't placed any orders yet.</p>
+        <a th:href="@{/catalogue}" class="btn-primary">Start Shopping</a>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(orders)}" class="orders-list">
+        <div th:each="order : ${orders}" class="order-card">
+            <div class="order-header">
+                <span class="order-id">Order #<span th:text="${order.id}">1</span></span>
+                <span class="order-date" th:text="${#temporals.format(order.orderDate, 'MMM dd, yyyy HH:mm')}">Date</span>
+                <span class="status-badge" th:text="${order.status}">PLACED</span>
+            </div>
+            <div class="order-items">
+                <span th:each="item, iter : ${order.items}">
+                    <span th:text="${item.product.name}">Product</span> x<span th:text="${item.quantity}">1</span>
+                    <span th:unless="${iter.last}">, </span>
+                </span>
+            </div>
+            <div class="order-footer">
+                <span>Shipped to: <span th:text="${order.shippingCity}">City</span></span>
+                <span class="order-total" th:text="'Total: $' + ${#numbers.formatDecimal(order.total + order.shippingCost, 1, 2)}">$0.00</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

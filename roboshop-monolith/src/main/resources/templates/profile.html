@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>Profile</title></head>
+<body>
+<div layout:fragment="content">
+    <h1>My Profile</h1>
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-avatar" th:text="${user.firstName != null ? user.firstName.substring(0,1) : user.username.substring(0,1)}">A</div>
+            <div class="profile-details">
+                <div class="detail-row"><span>Username:</span><span th:text="${user.username}">admin</span></div>
+                <div class="detail-row"><span>Email:</span><span th:text="${user.email}">admin@roboshop.com</span></div>
+                <div class="detail-row"><span>Name:</span><span th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">Admin User</span></div>
+                <div class="detail-row" th:if="${user.phone}"><span>Phone:</span><span th:text="${user.phone}">555-0100</span></div>
+                <div class="detail-row"><span>Member since:</span><span th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}">Date</span></div>
+            </div>
+        </div>
+        <div class="profile-actions">
+            <a th:href="@{/orders}" class="btn-secondary">View Orders</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

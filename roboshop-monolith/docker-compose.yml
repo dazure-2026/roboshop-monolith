@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: RoboShop@1
+      MYSQL_DATABASE: roboshop
+      MYSQL_USER: roboshop
+      MYSQL_PASSWORD: RoboShop@1
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./src/main/resources/db/master-data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pRoboShop@1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    expose:
+      - "8080"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: roboshop
+      MYSQL_PASSWORD: RoboShop@1
+      SQL_INIT_MODE: never
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./src/main/resources/static/css:/usr/share/nginx/html/css:ro
+      - ./src/main/resources/static/js:/usr/share/nginx/html/js:ro
+      - ./src/main/resources/static/images:/usr/share/nginx/html/images:ro
+    depends_on:
+      - app
+
+volumes:
+  mysql-data:

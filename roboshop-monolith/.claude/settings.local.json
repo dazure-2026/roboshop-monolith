@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh api:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(do echo:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod +x:*)",
+      "Bash(docker-compose:*)",
+      "Bash(curl:*)",
+      "Bash(brew list:*)",
+      "Bash(brew install:*)",
+      "Bash(k6 run:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker system:*)",
+      "Bash(docker ps:*)",
+      "Bash(rsvg-convert:*)",
+      "Bash(sips:*)",
+      "Bash(gh:*)",
+      "Read(//Users/skalluru/repos/claude/roboshop-v3/**)",
+      "Read(//Users/skalluru/repos/claude/roboshop-microservices/**)",
+      "Bash(grep:*)",
+      "Bash(cat /Users/skalluru/repos/claude/roboshop-microservices/ratings/app.py | grep -E \"os.getenv|PORT|HOST|URL\" | head -15\ncat /Users/skalluru/repos/claude/roboshop-microservices/notification/app.py | grep -E \"os.getenv|PORT|HOST|URL|AMQP\" | head -15\ncat /Users/skalluru/repos/claude/roboshop-microservices/orders/src/main/java/com/roboshop/orders/config/RabbitMQConfig.java 2>/dev/null | head -20\ngrep -r \"getenv\\\\|os.environ\" /Users/skalluru/repos/claude/roboshop-microservices/orders/src/main/resources/ 2>/dev/null\ncat /Users/skalluru/repos/claude/roboshop-microservices/orders/src/main/resources/application.properties 2>/dev/null)",
+      "Bash(git:*)"
+    ]
+  }
+}

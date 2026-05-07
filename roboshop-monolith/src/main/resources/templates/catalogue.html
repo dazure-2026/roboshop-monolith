@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>Catalogue</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="page-header">
+        <h1>Product Catalogue</h1>
+        <form th:action="@{/catalogue}" method="get" class="search-form">
+            <input type="text" name="q" placeholder="Search products..." th:value="${searchQuery}" class="search-input">
+            <button type="submit" class="btn-primary">Search</button>
+        </form>
+    </div>
+
+    <div class="catalogue-layout">
+        <aside class="sidebar">
+            <h3>Categories</h3>
+            <ul class="category-list">
+                <li><a th:href="@{/catalogue}" th:classappend="${selectedCategory == null && searchQuery == null} ? 'active'">All Products</a></li>
+                <li th:each="cat : ${categories}">
+                    <a th:href="@{/catalogue(category=${cat})}" th:text="${cat}" th:classappend="${selectedCategory == cat} ? 'active'">Category</a>
+                </li>
+            </ul>
+        </aside>
+
+        <div class="product-grid">
+            <div th:if="${#lists.isEmpty(products)}" class="empty-state">
+                <p>No products found.</p>
+            </div>
+            <div th:each="product : ${products}" class="product-card">
+                <div class="product-image">
+                    <span class="product-category-badge" th:text="${product.category}">Category</span>
+                    <img th:src="${product.imageUrl}" th:alt="${product.name}" class="product-img"/>
+                </div>
+                <div class="product-info">
+                    <h3 th:text="${product.name}">Product Name</h3>
+                    <p class="product-desc" th:text="${#strings.abbreviate(product.description, 80)}">Description</p>
+                    <div class="product-footer">
+                        <span class="product-price" th:text="'$' + ${#numbers.formatDecimal(product.price, 1, 2)}">$0.00</span>
+                        <div class="product-actions">
+                            <a th:href="@{/product/{id}(id=${product.id})}" class="btn-secondary">Details</a>
+                            <form th:action="@{/cart/add}" method="post" style="display:inline">
+                                <input type="hidden" name="productId" th:value="${product.id}">
+                                <button type="submit" class="btn-primary-sm">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

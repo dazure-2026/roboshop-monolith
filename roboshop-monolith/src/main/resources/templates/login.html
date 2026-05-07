@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head><title>Login</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="auth-container">
+        <h1>Login</h1>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}">Error</div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}">Success</div>
+
+        <form th:action="@{/login}" method="post" class="auth-form">
+            <input type="hidden" name="redirect" th:value="${redirect}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required class="form-input" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required class="form-input" placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn-primary btn-lg btn-block">Login</button>
+        </form>
+        <p class="auth-link">Don't have an account? <a th:href="@{/register}">Register here</a></p>
+        <p class="auth-hint">Demo: admin / RoboShop@1</p>
+    </div>
+</div>
+</body>
+</html>
